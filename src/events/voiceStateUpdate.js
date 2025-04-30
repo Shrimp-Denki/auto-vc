@@ -1,4 +1,3 @@
-// src/events/voiceStateUpdate.js
 const { Events, ChannelType, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
@@ -12,7 +11,8 @@ module.exports = {
     const hubs = {
       hubOn: '1363034383996682371',
       hubOff: '1363034386051895518',
-      camOn: '1363034388425740339'
+      camOn: '1363034388425740339',
+      free: '1367077176721018930'
     };
 
     let createOpts;
@@ -25,17 +25,16 @@ module.exports = {
         permissionOverwrites: [
           {
             id: guild.roles.everyone.id,
-            allow: [ PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Speak ],
-            deny: [ PermissionFlagsBits.Stream, PermissionFlagsBits.UseSoundboard, PermissionFlagsBits.UseExternalSounds ]
+            allow: [PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Speak],
+            deny: [PermissionFlagsBits.Stream, PermissionFlagsBits.UseSoundboard, PermissionFlagsBits.UseExternalSounds]
           },
           {
             id: newState.member.id,
-            allow: [ PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Speak, PermissionFlagsBits.Stream ]
+            allow: [PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Speak, PermissionFlagsBits.Stream]
           }
         ]
       };
-    }
-    else if (newState.channelId === hubs.hubOff) {
+    } else if (newState.channelId === hubs.hubOff) {
       createOpts = {
         name: `voice-mic-off #${guild.channels.cache.filter(c => c.name.startsWith('voice-mic-off')).size + 1}`,
         type: ChannelType.GuildVoice,
@@ -44,13 +43,12 @@ module.exports = {
         permissionOverwrites: [
           {
             id: guild.roles.everyone.id,
-            allow: [ PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel ],
-            deny: [ PermissionFlagsBits.Speak, PermissionFlagsBits.Stream, PermissionFlagsBits.UseSoundboard, PermissionFlagsBits.UseExternalSounds ]
+            allow: [PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel],
+            deny: [PermissionFlagsBits.Speak, PermissionFlagsBits.Stream, PermissionFlagsBits.UseSoundboard, PermissionFlagsBits.UseExternalSounds]
           }
         ]
       };
-    }
-    else if (newState.channelId === hubs.camOn) {
+    } else if (newState.channelId === hubs.camOn) {
       createOpts = {
         name: `phòng-cam-on #${guild.channels.cache.filter(c => c.name.startsWith('phòng-cam-on')).size + 1}`,
         type: ChannelType.GuildVoice,
@@ -59,8 +57,28 @@ module.exports = {
         permissionOverwrites: [
           {
             id: guild.roles.everyone.id,
-            allow: [ PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Speak, PermissionFlagsBits.Stream ],
-            deny: [ PermissionFlagsBits.UseSoundboard, PermissionFlagsBits.UseExternalSounds ]
+            allow: [PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Speak, PermissionFlagsBits.Stream],
+            deny: [PermissionFlagsBits.UseSoundboard, PermissionFlagsBits.UseExternalSounds]
+          }
+        ]
+      };
+    } else if (newState.channelId === hubs.free) {
+      createOpts = {
+        name: `phòng-tự-do #${guild.channels.cache.filter(c => c.name.startsWith('phòng-tự-do')).size + 1}`,
+        type: ChannelType.GuildVoice,
+        parent: guild.channels.cache.get(hubs.free).parent,
+        userLimit: 25,
+        permissionOverwrites: [
+          {
+            id: guild.roles.everyone.id,
+            allow: [
+              PermissionFlagsBits.Connect,
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.Speak,
+              PermissionFlagsBits.Stream,
+              PermissionFlagsBits.UseSoundboard,
+              PermissionFlagsBits.UseExternalSounds
+            ]
           }
         ]
       };
@@ -69,16 +87,13 @@ module.exports = {
     if (createOpts) {
       try {
         const newCh = await guild.channels.create(createOpts);
-        // đánh dấu channel này do bot tạo
         client.dynamicVoiceChannels.add(newCh.id);
-        // move user qua
         await newState.setChannel(newCh);
       } catch (err) {
         console.error('Tạo voice channel thất bại:', err);
       }
     }
 
-    // xóa channel khi trống
     const oldCh = oldState.channel;
     if (oldCh && client.dynamicVoiceChannels.has(oldCh.id) && oldCh.members.size === 0) {
       client.dynamicVoiceChannels.delete(oldCh.id);
