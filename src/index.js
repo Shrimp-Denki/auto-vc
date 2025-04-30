@@ -16,6 +16,7 @@ const client = new Client({
 });
 
 // Add commands collection to client
+client.dynamicVoiceChannels = new Set();
 client.commands = new Collection();
 
 // Load commands
