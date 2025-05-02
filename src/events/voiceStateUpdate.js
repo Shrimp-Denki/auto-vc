@@ -12,7 +12,9 @@ module.exports = {
       hubOn: '1363034383996682371',
       hubOff: '1363034386051895518',
       camOn: '1363034388425740339',
-      free: '1367077176721018930'
+      free: '1367077176721018930',
+      couple: '1367881041666375721',
+      alone: '1367881106581360701'
     };
 
     let createOpts;
@@ -68,6 +70,46 @@ module.exports = {
         type: ChannelType.GuildVoice,
         parent: guild.channels.cache.get(hubs.free).parent,
         userLimit: 25,
+        permissionOverwrites: [
+          {
+            id: guild.roles.everyone.id,
+            allow: [
+              PermissionFlagsBits.Connect,
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.Speak,
+              PermissionFlagsBits.Stream,
+              PermissionFlagsBits.UseSoundboard,
+              PermissionFlagsBits.UseExternalSounds
+            ]
+          }
+        ]
+      };
+    } else if (newState.channelId === hubs.couple) {
+      createOpts = {
+        name: `phòng-couple #${guild.channels.cache.filter(c => c.name.startsWith('phòng-couple')).size + 1}`,
+        type: ChannelType.GuildVoice,
+        parent: guild.channels.cache.get(hubs.couple).parent,
+        userLimit: 2,
+        permissionOverwrites: [
+          {
+            id: guild.roles.everyone.id,
+            allow: [
+              PermissionFlagsBits.Connect,
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.Speak,
+              PermissionFlagsBits.Stream,
+              PermissionFlagsBits.UseSoundboard,
+              PermissionFlagsBits.UseExternalSounds
+            ]
+          }
+        ]
+      };
+    } else if (newState.channelId === hubs.alone) {
+      createOpts = {
+        name: `phòng-alone #${guild.channels.cache.filter(c => c.name.startsWith('phòng-alone')).size + 1}`,
+        type: ChannelType.GuildVoice,
+        parent: guild.channels.cache.get(hubs.alone).parent,
+        userLimit: 1,
         permissionOverwrites: [
           {
             id: guild.roles.everyone.id,
